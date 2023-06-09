@@ -13,6 +13,7 @@ import FirebaseFirestoreSwift
 import FirebaseFirestore
 
 struct ShowEntryMoreView: View {
+    @StateObject private var viewModel: ShowEntryMoreViewModel = ShowEntryMoreViewModel()
     
     var show2 : ApiShows.Returned
     var show : ShowEntry? = nil
@@ -122,21 +123,21 @@ struct ShowEntryMoreView: View {
                 HStack {
                     Button("Want to watch") {
                         listChoice = "wantToWatch"
-                        saveToFireStore()
+                        viewModel.saveToFireStore(show2: show2, listChoice: "wantToWatch")
                     }
                     Button("Watching") {
                         listChoice = "watching"
-                        saveToFireStore()
+                        viewModel.saveToFireStore(show2: show2, listChoice: "watching")
                     }
                 }
                 HStack {
                     Button("Completed") {
                         listChoice = "completed"
-                        saveToFireStore()
+                        viewModel.saveToFireStore(show2: show2, listChoice: "completed")
                     }
                     Button("Dropped") {
                         listChoice = "dropped"
-                        saveToFireStore()
+                        viewModel.saveToFireStore(show2: show2, listChoice: "dropped")
                     }
                 }
             }
@@ -155,20 +156,6 @@ struct ShowEntryMoreView: View {
         }
     }
 }
-func saveToFireStore() {
-    let db = Firestore.firestore()
-    guard let user = Auth.auth().currentUser else {return}
-    do {
-        _ = try db.collection("users").document(user.uid).collection(listChoice).addDocument(from: show2)
-        showingAlert = true
-    } catch {
-            print("error!")
-        }
-    }
+
 }
-/*
-struct ShowEntryMoreView_Previews: PreviewProvider {
-    static var previews: some View {
-        ShowEntryMoreView()
-    }
-}*/
+

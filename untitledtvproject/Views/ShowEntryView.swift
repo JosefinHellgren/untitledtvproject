@@ -14,6 +14,7 @@ import FirebaseFirestoreSwift
 import FirebaseFirestore
 
 struct ShowEntryView : View {
+    @StateObject private var viewModel: ShowEntryViewModel = ShowEntryViewModel()
     
     @State var show2 : ApiShows.Returned
     @State var name : String = ""
@@ -94,21 +95,21 @@ struct ShowEntryView : View {
                     HStack {
                         Button("Want to watch") {
                             listChoice = "wantToWatch"
-                            saveToFireStore()
+                            viewModel.saveToFireStore(show2: show2, listChoice: "wantToWatch")
                         }
                         Button("Watching") {
                             listChoice = "watching"
-                            saveToFireStore()
+                            viewModel.saveToFireStore(show2: show2, listChoice: "watching")
                         }
                     }
                     HStack {
                         Button("Completed") {
                             listChoice = "completed"
-                            saveToFireStore()
+                            viewModel.saveToFireStore(show2: show2, listChoice: "completed")
                         }
                         Button("Dropped") {
                             listChoice = "dropped"
-                            saveToFireStore()
+                            viewModel.saveToFireStore(show2: show2, listChoice: "dropped")
                         }
                     }
                 }
@@ -120,7 +121,7 @@ struct ShowEntryView : View {
         }
         .background(Color(.systemGray6))
         .onAppear() {
-            setContent()
+            viewModel.setContent()
             _ = Animation.easeInOut(duration: 1)
 
             withAnimation {
@@ -128,38 +129,7 @@ struct ShowEntryView : View {
             }
         }
     }
-    func saveToFireStore() {
-        let db = Firestore.firestore()
-        guard let user = Auth.auth().currentUser else {return}
-        do {
-            _ = try db.collection("users").document(user.uid).collection(listChoice).addDocument(from: show2)
-            showingAlertPopUp = true
-        } catch {
-            print("error!")
-            }
-        }
-    func setContent() {
-        
-        summary = summary.replacingOccurrences(of: "<p>", with: "")
-        summary = summary.replacingOccurrences(of: "</p>", with: "")
-        summary = summary.replacingOccurrences(of: "<b>", with: "")
-        summary = summary.replacingOccurrences(of: "</b>", with: "")
-        summary = summary.replacingOccurrences(of: "<i>", with: "")
-        summary = summary.replacingOccurrences(of: "</i>", with: "")
 
-/*
-        guard let url1 = URL(string: show2.show.image?.medium ?? "") else { print("error url not correct emil"); return }
-        do {
-            //let data = try Data(contentsOf: url1)
-            image?.medium = url1.absoluteString
-        } catch {
-            print("error, no img from url \(url1)")
-        }*/
-/*
-        if let show = show {
-            name = show.name
-            language = show.language
-            summary = show.summary
-        }*/
-    }
+
+
 }

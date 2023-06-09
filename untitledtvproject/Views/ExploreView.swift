@@ -8,15 +8,10 @@
 import SwiftUI
 
 struct ExploreView: View {
-    @State var exploreList : [ApiShows.Show] = []
     
-    @State var hboList : [ApiShows.Show] = []
-    @State var foxList : [ApiShows.Show] = []
-    @State var abcList : [ApiShows.Show] = []
-    @State var cbsList : [ApiShows.Show] = []
-    @State var itv1List : [ApiShows.Show] = []
-    @State var nbcList : [ApiShows.Show] = []
-    @State var showTimeList : [ApiShows.Show] = []
+    @StateObject private var viewModel: ExploreViewModel = ExploreViewModel()
+    
+ 
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -27,7 +22,7 @@ struct ExploreView: View {
                 HStack {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
-                            ForEach(hboList, id: \.id) { show in
+                            ForEach(viewModel.hboList, id: \.id) { show in
                                 AsyncImage(url: URL(string: show.image?.medium ?? "https://i.imgur.com/e3AEk4W.png"))
                                     .frame(width: 140, height: 210)
                             }
@@ -40,7 +35,7 @@ struct ExploreView: View {
                 HStack {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
-                            ForEach(foxList, id: \.id) { show in
+                            ForEach(viewModel.foxList, id: \.id) { show in
                                 AsyncImage(url: URL(string: show.image?.medium ?? "https://i.imgur.com/e3AEk4W.png"))
                                     .frame(width: 140, height: 210)
                             }
@@ -53,7 +48,7 @@ struct ExploreView: View {
                 HStack {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
-                            ForEach(cbsList, id: \.id) { show in
+                            ForEach(viewModel.cbsList, id: \.id) { show in
                                 AsyncImage(url: URL(string: show.image?.medium ?? "https://i.imgur.com/e3AEk4W.png"))
                                     .frame(width: 140, height: 210)
                             }
@@ -66,7 +61,7 @@ struct ExploreView: View {
                 HStack {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
-                            ForEach(abcList, id: \.id) { show in
+                            ForEach(viewModel.abcList, id: \.id) { show in
                                 AsyncImage(url: URL(string: show.image?.medium ?? "https://i.imgur.com/e3AEk4W.png"))
                                     .frame(width: 140, height: 210)
                             }
@@ -79,7 +74,7 @@ struct ExploreView: View {
                 HStack {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
-                            ForEach(nbcList, id: \.id) { show in
+                            ForEach(viewModel.nbcList, id: \.id) { show in
                                 AsyncImage(url: URL(string: show.image?.medium ?? "https://i.imgur.com/e3AEk4W.png"))
                                     .frame(width: 140, height: 210)
                             }
@@ -127,99 +122,12 @@ struct ExploreView: View {
             }
         }
         .onAppear() {
-            getData()
+            viewModel.getData()
         }
     }
-    func getData() { //get data for all shows in the api. For some reason these objects could not look the same as everything else (eg. apishows.returned, so these are instead apishows.show. Which works to display the images I want to display but I cant make them become contextual navigationlinks that shows the show inside the showentryview. so these images are more like a library.
-        
-        let urlStringAll = "https://api.tvmaze.com/shows"
-                
-        guard let url = URL(string: urlStringAll) else {
-            print("Error could not create url from \(urlStringAll)")
-            return
-        }
-        
-        exploreList.removeAll()
-        
-        let session = URLSession.shared
-        let task = session.dataTask(with: url) { data, response, error in
-            if let error = error {
-                print("error \(error.localizedDescription)")
-            }
-            //deal with the data
-            do {
-                exploreList = try JSONDecoder().decode([ApiShows.Show].self, from: data!)
-                distributeData()
-            } catch {
-                print("catch: json error: \(error.localizedDescription)")
-            }
-        }
-        task.resume()
-    }
-    func distributeData() {
-        for item in exploreList {
-            if item.network?.name! == "HBO" {
-                if item.rating?.average != nil {
-                    if (item.rating?.average)! >= 6.0 {
-                        hboList.append(item)
-                    }
-                }
-            }
-        }
-        for item in exploreList {
-            if item.network?.name! == "FOX" {
-                if item.rating?.average != nil {
-                    if (item.rating?.average)! >= 6.0 {
-                        foxList.append(item)
-                    }
-                }
-            }
-        }
-        for item in exploreList {
-            if item.network?.name! == "ABC" {
-                if item.rating?.average != nil {
-                    if (item.rating?.average)! >= 6.0 {
-                        abcList.append(item)
-                    }
-                }
-            }
-        }
-        for item in exploreList {
-            if item.network?.name! == "NBC" {
-                if item.rating?.average != nil {
-                    if (item.rating?.average)! >= 6.0 {
-                        nbcList.append(item)
-                    }
-                }
-            }
-        }
-        for item in exploreList {
-            if item.network?.name! == "CBS" {
-                if item.rating?.average != nil {
-                    if (item.rating?.average)! >= 6.0 {
-                        cbsList.append(item)
-                    }
-                }
-            }
-        }
-        for item in exploreList {
-            if item.network?.name! == "Showtime" {
-                if item.rating?.average != nil {
-                    if (item.rating?.average)! >= 6.0 {
-                        showTimeList.append(item)
-                    }
-                }
-            }
-        }
-        for item in exploreList {
-            if item.network?.name! == "ITV1" {
-                if item.rating?.average != nil {
-                    if (item.rating?.average)! >= 6.0 {
-                        itv1List.append(item)
-                    }
-                }
-            }
-        }
-    }
+    
+    
+ 
+       
 }
 
